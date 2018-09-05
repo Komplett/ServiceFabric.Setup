@@ -34,3 +34,5 @@ function ChocoInstall
     $cmdOutPut = & choco install -myv $Package --version="$Version" *>&1 | Out-String        
     Log -Message "Installing $Package from Chocolatey`r`n$cmdOutput" -Level "INFO" -Logger "ChocoInstall"
 }
+
+InstallDependencies
