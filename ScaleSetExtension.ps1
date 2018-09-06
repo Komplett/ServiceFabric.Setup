@@ -50,7 +50,7 @@ function ChocoInstall
         $process.StartInfo.RedirectStandardError = $true;
         $process.StartInfo.UseShellExecute = $false;
         $null = $process.Start();
-        $process.WaitForExit();
+        $process.WaitForExit(1000 * 60 * 3);
         $stdOut = $process.StandardOutput.ReadToEnd();
         $stdErr = $process.StandardError.ReadToEnd();
 
