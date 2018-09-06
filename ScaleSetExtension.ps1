@@ -10,8 +10,9 @@ function Setup
     SetTimeZone
     InstallCocolatey
     ChocoInstall -Package "dotnet4.7.2"
-    ChocoInstall -Package "dotnetcore-runtime" -Version "2.0.7"
-    ChocoInstall -Package "dotnetcore-runtime" -Version "2.1.3"
+    ChocoInstall -Package "dotnetcore-runtime" -Version "2.0.7" -Flags "-m"
+    ChocoInstall -Package "dotnetcore-runtime" -Version "2.1.3" -Flags "-m"
+    ChocoInstall -Package "newrelic-dotnet" -Params "license_key=$NewRelicKey"
 }
 
 function SetTimeZone
@@ -37,9 +38,30 @@ function InstallCocolatey
 function ChocoInstall
 {
     Param ([string] $Package,
-    [string] $Version = "")    
-    $cmdOutPut = & choco install -myv $Package --version="$Version" *>&1 | Out-String        
-    Log -Message "Installing $Package from Chocolatey`r`n$cmdOutput" -Level "INFO" -Logger "ChocoInstall"
+    [string] $Version = "",
+    [string] $Params = "",
+    [string] $Flags = "")  
+    
+    $process = [System.Diagnostics.Process]::new();
+
+     try {
+        $process.StartInfo = [System.Diagnostics.ProcessStartInfo]::new("$env:ChocolateyInstall\bin\choco.exe", "install -yv $Flags $Package --version=`"$Version`" --params=`"$Params`"");
+        $process.StartInfo.RedirectStandardOutput = $true;
+        $process.StartInfo.RedirectStandardError = $true;
+        $process.StartInfo.UseShellExecute = $false;
+        $null = $process.Start();
+        $process.WaitForExit();
+        $stdOut = $process.StandardOutput.ReadToEnd();
+        $stdErr = $process.StandardError.ReadToEnd();
+
+        if ( $process.ExitCode -eq 0 ) {            
+            Log -Message "Installed $Package from Chocolatey`r`n$stdOut" -Level "INFO" -Logger "ChocoInstall"
+        } else {
+            Log -Message "Error trying to install $Package from Chocolatey`r`n$stdErr`r`n$stdOut" -Level "ERROR" -Logger "ChocoInstall"
+        };
+    } finally {
+        $process.Dispose();
+    };
 }
 
 function PrepareDisks {
