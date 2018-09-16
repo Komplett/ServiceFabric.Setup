@@ -12,7 +12,6 @@ function Setup
     ChocoInstall -Package "dotnet4.7.2";
     ChocoInstall -Package "dotnetcore-runtime" -Version "2.0.7" -Flags "-m";
     ChocoInstall -Package "dotnetcore-runtime" -Version "2.1.3" -Flags "-m";
-
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey
 }
 
@@ -78,6 +77,8 @@ function SetupNewRelic
     $DotNetFolder = "$PSScriptRoot\NewRelicDotNet";
     $CoreFolder = "$PSScriptRoot\NewRelicCore";
 
+    ResetNewRelicEnvironmentVariables;
+
     (New-Object System.Net.WebClient).DownloadFile($DotNetUrl, $DotNetFile);
     (New-Object System.Net.WebClient).DownloadFile($CoreUrl, $CoreNetFile);
 
@@ -96,6 +97,20 @@ function SetupNewRelic
 
     Set-Location -Path $CurrentFolder -PassThru;
 
+}
+
+function ResetNewRelicEnvironmentVariables
+{
+    [Environment]::SetEnvironmentVariable("NEW_RELIC_LICENSE_KEY", "", "Machine");
+    [Environment]::SetEnvironmentVariable("NEW_RELIC_APP_NAME", "", "Machine");
+    [Environment]::SetEnvironmentVariable("COR_ENABLE_PROFILING", "", "Machine");
+    [Environment]::SetEnvironmentVariable("COR_PROFILER", "", "Machine");
+    [Environment]::SetEnvironmentVariable("COR_PROFILER_PATH", "", "Machine");
+    [Environment]::SetEnvironmentVariable("NEWRELIC_HOME", "", "Machine");
+    [Environment]::SetEnvironmentVariable("CORECLR_ENABLE_PROFILING", "", "Machine");
+    [Environment]::SetEnvironmentVariable("CORECLR_PROFILER", "", "Machine");
+    [Environment]::SetEnvironmentVariable("CORECLR_PROFILER_PATH", "", "Machine");
+    [Environment]::SetEnvironmentVariable("CORECLR_NEWRELIC_HOME", "", "Machine");
 }
 
 function RunProcess
