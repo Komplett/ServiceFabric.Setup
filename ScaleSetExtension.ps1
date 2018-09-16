@@ -42,27 +42,10 @@ function ChocoInstall
     [string] $Version = "",
     [string] $Params = "",
     [string] $Flags = "")  
-    
-    $process = [System.Diagnostics.Process]::new();
 
-     try {
-        $process.StartInfo = [System.Diagnostics.ProcessStartInfo]::new("$env:ChocolateyInstall\bin\choco.exe", "install -yv $Flags $Package --version=`"$Version`" --params=`"$Params`"");
-        $process.StartInfo.RedirectStandardOutput = $true;
-        $process.StartInfo.RedirectStandardError = $true;
-        $process.StartInfo.UseShellExecute = $false;
-        $null = $process.Start();
-        $process.WaitForExit(1000 * 60 * 3);
-        $stdOut = $process.StandardOutput.ReadToEnd();
-        $stdErr = $process.StandardError.ReadToEnd();
-
-        if ( $process.ExitCode -eq 0 ) {            
-            Log -Message "Installed $Package from Chocolatey`r`n$stdOut" -Level "INFO" -Logger "ChocoInstall"
-        } else {
-            Log -Message "Error trying to install $Package from Chocolatey`r`n$stdErr`r`n$stdOut" -Level "ERROR" -Logger "ChocoInstall"
-        };
-    } finally {
-        $process.Dispose();
-    };
+    $Command = "$env:ChocolateyInstall\bin\choco.exe";
+    $Arguments = "install -yv $Flags $Package --version=`"$Version`" --params=`"$Params`"";
+    RunProcess -Command $Command -Arguments $Arguments -Logger "ChocoInstall" -Description "Installing $Package from Chocolatey";    
 }
 
 function PrepareDisks {
@@ -130,13 +113,47 @@ function SetupNewRelic
     Expand-Archive -Force $CoreNetFile -DestinationPath $CoreFolder;
 
     Set-Location -Path $DotNetFolder -PassThru;
-    & "$DotNetFolder\install.cmd" -LicenseKey $LicenseKey -NoIISReset -InstrumentAll -ForceLicenseKey;
+    $OutPut = & "$DotNetFolder\install.cmd" -LicenseKey $LicenseKey -NoIISReset -InstrumentAll -ForceLicenseKey *>&1 | Out-String;;
+    # RunProcess -Command "$DotNetFolder\install.cmd" -Arguments "-LicenseKey $LicenseKey -NoIISReset -InstrumentAll -ForceLicenseKey" -Logger "NewRelicDotNetInstall" -Description "Installing NewRelic .Net Agent $Version";    
+    Log -Message "Installed NewRelic .Net Agent $Version`n$OutPut" -Level "INFO" -Logger "NewRelicDotNetInstall";
 
     Set-Location -Path $CoreFolder -PassThru
-    & "$CoreFolder\installAgent.ps1" -destination "$Env:Programfiles\New Relic\.NetCore Agent" -installType global -licenseKey $LicenseKey -Force
+    $OutPut = & "$CoreFolder\installAgent.ps1" -destination "$Env:Programfiles\New Relic\.NetCore Agent" -installType global -licenseKey $LicenseKey -Force *>&1 | Out-String;
+    Log -Message "Installed NewRelic .Net Core Agent $Version`n$OutPut" -Level "INFO" -Logger "NewRelicDotNetCoreInstall";
+
 
     Set-Location -Path $CurrentFolder -PassThru;
 
+}
+
+function RunProcess
+{
+    Param ([string] $Command,
+    [string] $Arguments,
+    [string] $Logger,
+    [string] $Description)  
+    
+    $process = [System.Diagnostics.Process]::new();
+
+     try {
+        $process.StartInfo = [System.Diagnostics.ProcessStartInfo]::new($Command, $Arguments);
+        $process.StartInfo.RedirectStandardOutput = $true;
+        $process.StartInfo.RedirectStandardError = $true;
+        $process.StartInfo.UseShellExecute = $false;
+        $process.StartInfo.CreateNoWindow = $false;
+        $null = $process.Start();
+        $process.WaitForExit(1000 * 60 * 3);
+        $stdOut = $process.StandardOutput.ReadToEnd();
+        $stdErr = $process.StandardError.ReadToEnd();
+
+        if ( $process.ExitCode -eq 0 ) {            
+            Log -Message "Success: $Description`r`n$stdOut" -Level "INFO" -Logger $Logger
+        } else {
+            Log -Message "Error: $Descriptionr`n$stdErr`r`n$stdOut" -Level "ERROR" -Logger $Logger
+        };
+    } finally {
+        $process.Dispose();
+    };
 }
 
 Setup;
