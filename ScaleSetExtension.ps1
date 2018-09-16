@@ -1,7 +1,13 @@
 ﻿[CmdletBinding()]
 Param (
-	$LoggEndPoint,
+    [Parameter(Position=0)]
+	$LoggEndPoint
+,
+    [Parameter(Position=1)]
     $NewRelicKey
+,
+   [Parameter()]
+   [Switch]$Clear
 )
 
 function Setup
