@@ -12,6 +12,8 @@ Param (
 
 function Setup
 {
+    Log -Message "Setup starting" -Level "INFO" -Logger "Setup";
+
 	PrepareDisks;
     SetTimeZone;
     InstallCocolatey;
@@ -19,6 +21,8 @@ function Setup
     ChocoInstall -Package "dotnetcore-runtime" -Version "2.0.7" -Flags "-m";
     ChocoInstall -Package "dotnetcore-runtime" -Version "2.1.3" -Flags "-m";
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey
+
+    Log -Message "Setup completed" -Level "INFO" -Logger "Setup";
 }
 
 function SetTimeZone
