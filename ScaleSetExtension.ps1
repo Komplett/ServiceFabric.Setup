@@ -1,6 +1,7 @@
 ﻿[CmdletBinding()]
 Param (
-	$LoggEndPoint
+	$LoggEndPoint,
+    $NewRelicKey
 )
 
 function Setup
@@ -11,6 +12,8 @@ function Setup
     ChocoInstall -Package "dotnet4.7.2";
     ChocoInstall -Package "dotnetcore-runtime" -Version "2.0.7" -Flags "-m";
     ChocoInstall -Package "dotnetcore-runtime" -Version "2.1.3" -Flags "-m";
+
+    SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey
 }
 
 function SetTimeZone
@@ -105,6 +108,35 @@ function Log
     $FormattedMessage = "$FormattedDate`r`napplication=Komplett.ServiceFabric.ScaleSet-Extension level=$Level logger=Komplett.ServiceFabric.ScaleSet-Extension.$Logger hostname=$HostName projectowner=Green`r`n$Message`r`n";
     Write-Output $FormattedMessage;
     Send-UdpDatagram -EndPoint $LoggEndPoint -Port 666 -Message $FormattedMessage;
+}
+
+function SetupNewRelic
+{
+    Param ([string] $Version,
+    [string] $LicenseKey)
+    
+    $CurrentFolder = $PSScriptRoot;
+    $DotNetUrl = "https://download.newrelic.com/dot_net_agent/previous_releases/$Version/newrelic-agent-win-$Version-scriptable-installer.zip";
+    $CoreUrl = "https://download.newrelic.com/dot_net_agent/previous_releases/$Version/newrelic-netcore20-agent-win-$Version-scriptable-installer.zip";
+    $DotNetFile = "$PSScriptRoot\NewRelicDotNet-$Version.zip";
+    $CoreNetFile = "$PSScriptRoot\NewReliCore-$Version.zip";
+    $DotNetFolder = "$PSScriptRoot\NewRelicDotNet";
+    $CoreFolder = "$PSScriptRoot\NewRelicCore";
+
+    (New-Object System.Net.WebClient).DownloadFile($DotNetUrl, $DotNetFile);
+    (New-Object System.Net.WebClient).DownloadFile($CoreUrl, $CoreNetFile);
+
+    Expand-Archive -Force $DotNetFile -DestinationPath $DotNetFolder;
+    Expand-Archive -Force $CoreNetFile -DestinationPath $CoreFolder;
+
+    Set-Location -Path $DotNetFolder -PassThru;
+    & "$DotNetFolder\install.cmd" -LicenseKey $LicenseKey -NoIISReset -InstrumentAll -ForceLicenseKey;
+
+    Set-Location -Path $CoreFolder -PassThru
+    & "$CoreFolder\installAgent.ps1" -destination "$Env:Programfiles\New Relic\.NetCore Agent" -installType global -licenseKey $LicenseKey -Force
+
+    Set-Location -Path $CurrentFolder -PassThru;
+
 }
 
 Setup;
