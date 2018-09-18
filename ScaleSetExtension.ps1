@@ -104,9 +104,13 @@ function SetupNewRelic
     $OutPut = & "$CoreFolder\installAgent.ps1" -destination "$Env:Programfiles\New Relic\.NetCore Agent" -installType global -licenseKey $LicenseKey -Force *>&1 | Out-String;
     Log -Message "Installed NewRelic .Net Core Agent $Version`n$OutPut" -Level "INFO" -Logger "NewRelicDotNetCoreInstall";
 
-
     Set-Location -Path $CurrentFolder -PassThru;
 
+    # Cleanup
+    Remove-Item $DotNetFile;
+    Remove-Item $CoreNetFile;
+    Remove-Item –path $DotNetFolder –recurse
+    Remove-Item –path $CoreFolder –recurse
 }
 
 function ResetNewRelicEnvironmentVariables
