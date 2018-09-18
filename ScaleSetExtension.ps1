@@ -111,10 +111,11 @@ function SetupNewRelic
 
 function ResetNewRelicEnvironmentVariables
 {
+	[Environment]::SetEnvironmentVariable("NEWRELIC_INSTALL_PATH", "C:\Program Files\New Relic\.NET Agent", "Machine");
     [Environment]::SetEnvironmentVariable("NEW_RELIC_LICENSE_KEY", "", "Machine");
     [Environment]::SetEnvironmentVariable("NEW_RELIC_APP_NAME", "", "Machine");
-    [Environment]::SetEnvironmentVariable("COR_ENABLE_PROFILING", "", "Machine");
-    [Environment]::SetEnvironmentVariable("COR_PROFILER", "", "Machine");
+    [Environment]::SetEnvironmentVariable("COR_ENABLE_PROFILING", "1", "Machine");
+    [Environment]::SetEnvironmentVariable("COR_PROFILER", "{71DA0A04-7777-4EC6-9643-7D28B46A8A41}", "Machine");
     [Environment]::SetEnvironmentVariable("COR_PROFILER_PATH", "", "Machine");
     [Environment]::SetEnvironmentVariable("NEWRELIC_HOME", "", "Machine");
     [Environment]::SetEnvironmentVariable("CORECLR_ENABLE_PROFILING", "", "Machine");
