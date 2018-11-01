@@ -18,8 +18,7 @@ function Setup
     SetTimeZone;
     InstallCocolatey;
     ChocoInstall -Package "dotnet4.7.2";
-    ChocoInstall -Package "dotnetcore-runtime" -Version "2.0.7" -Flags "-m";
-    ChocoInstall -Package "dotnetcore-runtime" -Version "2.1.3" -Flags "-m";
+    ChocoInstall -Package "dotnetcore-runtime";
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey
 
     Log -Message "Setup completed" -Level "INFO" -Logger "Setup";
