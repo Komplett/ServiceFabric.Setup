@@ -19,7 +19,7 @@ function Setup
     InstallCocolatey;
     ChocoInstall -Package "dotnet4.7.2";
     ChocoInstall -Package "dotnetcore-runtime";
-    ChocoInstall -Package "nodejs-lts" -Version "10.14.2";
+    ChocoInstall -Package "nodejs-lts";
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey;
 
     Log -Message "Setup completed" -Level "INFO" -Logger "Setup";
