@@ -14,13 +14,13 @@ function Setup
 {
     Log -Message "Setup starting" -Level "INFO" -Logger "Setup";
 
-	PrepareDisks;
+    PrepareDisks;
     SetTimeZone;
     InstallCocolatey;
     ChocoInstall -Package "dotnet4.7.2";
     ChocoInstall -Package "dotnetcore-runtime";
-	ChocoInstall -Package "nodejs-lts" -Version "10.14.2";
-    SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey
+    ChocoInstall -Package "nodejs-lts" -Version "10.14.2";
+    SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey;
 
     Log -Message "Setup completed" -Level "INFO" -Logger "Setup";
 }
@@ -53,7 +53,7 @@ function ChocoInstall
     [string] $Flags = "")  
 
     $Command = "$env:ChocolateyInstall\bin\choco.exe";
-    $Arguments = "install -yv $Flags $Package --version=`"$Version`" --params=`"$Params`"";
+    $Arguments = "install -y $Flags $Package --version=`"$Version`" --params=`"$Params`"";
     RunProcess -Command $Command -Arguments $Arguments -Logger "ChocoInstall" -Description "Installing $Package from Chocolatey";    
 }
 
