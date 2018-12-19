@@ -15,7 +15,7 @@ $global:logFile = "log.txt";
 
 function Setup
 {
-	Remove-Item -path $global:logFile;
+	CleanLogfile;
 	Start-Transcript -path $global:logFile;
     Write-Event "Setup starting";
 	
@@ -33,6 +33,15 @@ function Setup
 	Stop-Transcript
 	
 	LogResults;
+}
+
+function CleanLogfile
+{
+	if (![System.IO.File]::Exists($global:logFile))
+	{
+		Remove-Item -path $global:logFile;
+		Start-Sleep -s 1;
+	}
 }
 
 function LogResults
