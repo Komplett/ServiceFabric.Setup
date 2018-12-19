@@ -143,6 +143,7 @@ function RunProcess
         $process.StartInfo.RedirectStandardError = $true;
         $process.StartInfo.UseShellExecute = $false;
         $process.StartInfo.CreateNoWindow = $false;
+		$process.StartInfo.Verb = "runas";
         $null = $process.Start();
         $process.WaitForExit(1000 * 60 * 3);
         $stdOut = $process.StandardOutput.ReadToEnd();
