@@ -23,7 +23,9 @@ function Setup
     SetTimeZone;
     InstallCocolatey;
 	RunChoco "choco install -y dotnet4.7.2";
-	RunChoco "choco install -y dotnetcore-runtime";
+	RunChoco "choco install -my dotnetcore-windowshosting --version 2.0.9";
+	RunChoco "choco install -my dotnetcore-windowshosting --version 2.1.7";
+	RunChoco "choco install -my dotnetcore-windowshosting --version 2.2.1";
 	RunChoco "choco install -y nodejs-lts --version 10.14.2";
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey;
 	SetupNewRelicCore -Version "8.6.45.0" -LicenseKey $NewRelicKey;
