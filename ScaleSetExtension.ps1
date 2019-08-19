@@ -21,12 +21,6 @@ function Setup
 	
     PrepareDisks;
     SetTimeZone;
-    InstallCocolatey;
-	RunChoco "choco install -y dotnet4.7.2";
-	RunChoco "choco install -my dotnetcore-windowshosting --version 2.0.8 --params='Quiet IgnoreMissingIIS'";
-	RunChoco "choco install -my dotnetcore-windowshosting --version 2.1.7 --params='Quiet IgnoreMissingIIS'";
-	RunChoco "choco install -my dotnetcore-windowshosting --version 2.2.1 --params='Quiet IgnoreMissingIIS'";
-	RunChoco "choco install -y nodejs-lts --version 10.14.2";
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey;
 	SetupNewRelicCore -Version "8.6.45.0" -LicenseKey $NewRelicKey;
 	
@@ -70,37 +64,11 @@ function Write-Event
 	
 }
 
-function RunChoco
-{
-	Param ([string] $Command)
-	
-	Write-Event "Running $Command";
-	$choco = "$env:ChocolateyInstall\bin\";
-	iex "$choco$Command";
-	if ($lastexitcode -ne 0) {
-		$global:errors++;
-	}
-}
-
 function SetTimeZone
 {
     $timeZone = "W. Europe Standard Time";
     $cmdOutPut = Set-TimeZone $timeZone *>&1 | Out-String;
     Write-Event "Setting timezone to $timeZone`r`n$cmdOutput";
-}
-
-function InstallCocolatey
-{
-	Write-Event "Install chocolatey";
-    choco.exe -v;
-    $Output = $?;
-    If (-Not $Output) {  
-        $cmdOutput = iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')) *>&1 | Out-String;
-        Write-Output "Installing Chocolatey`r`n$cmdOutput";
-    }
-    else {
-        Write-Output "Chocolatey already installed, skipping.";
-    }
 }
 
 function PrepareDisks {
