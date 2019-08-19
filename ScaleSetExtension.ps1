@@ -23,6 +23,8 @@ function Setup
     SetTimeZone;
     SetupNewRelic -Version "8.6.45.0" -LicenseKey $NewRelicKey;
 	SetupNewRelicCore -Version "8.6.45.0" -LicenseKey $NewRelicKey;
+    
+    Disable-NetAdapterChecksumOffload -Name * -UdpIPv4
 	
 	Write-Event "Setup Done";
 
