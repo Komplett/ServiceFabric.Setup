@@ -90,6 +90,9 @@ function PrepareDisks {
 		Format-Volume -FileSystem NTFS -NewFileSystemLabel $label.$count -Confirm:$false -Force;
 		$count++;
 	}
+	
+	Get-WmiObject -Class Win32_volume -Filter 'DriveType=5' | Select-Object -First 1 | Set-WmiInstance -Arguments @{DriveLetter='Z:'}
+	Get-Partition -DiskNumber 2 | Set-Partition -NewDriveLetter E
 }
 
 function SetupNewRelic
